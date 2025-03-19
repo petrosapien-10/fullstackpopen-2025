@@ -3,12 +3,23 @@ import Filter from "./components/Filter";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import personService from "./services/persons";
+import "./index.css";
+
+const Notification = ({ message, type }) => {
+  if (message === null) {
+    return null;
+  }
+
+  return <div className={type}>{message}</div>;
+};
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newSearchName, setNewSearchName] = useState("");
+  const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -31,25 +42,43 @@ const App = () => {
           `${newName} is already added to phonebook, replace the old number with a new one`
         )
       ) {
-        const index = persons.findIndex(
+        const existingPerson = persons.find(
           (person) => person.name.toLowerCase() === newName.toLowerCase()
         );
 
-        const changedPerson = { ...persons[index], number: newNumber };
+        const changedPerson = { ...existingPerson, number: newNumber };
         personService
-          .update(persons[index].id, changedPerson)
+          .update(existingPerson.id, changedPerson)
           .then((returnedPerson) => {
             console.log("Updated person: ", returnedPerson);
+
             setPersons(
-              persons.map((person) => {
-                return person.id === persons[index].id
-                  ? returnedPerson
-                  : person;
-              })
+              persons.map((person) =>
+                person.id === returnedPerson.id ? returnedPerson : person
+              )
             );
+
+            setMessageType("success");
+            setMessage(`Updated ${returnedPerson.name}`);
+
+            setTimeout(() => {
+              setMessageType(null);
+              setMessage(null);
+            }, 3000);
 
             setNewName("");
             setNewNumber("");
+          })
+          .catch((error) => {
+            console.error("Error updating person: ", error);
+            setMessageType("error");
+            setMessage(
+              `Information of ${changedPerson.name} has already been removed from server`
+            );
+            setTimeout(() => {
+              setMessage(null);
+              setMessageType(null);
+            }, 3000);
           });
       } else {
         console.log("Person update canceled");
@@ -65,6 +94,14 @@ const App = () => {
 
         setNewName("");
         setNewNumber("");
+
+        setMessageType("success");
+        setMessage(`Added ${returnedPerson.name}`);
+
+        setTimeout(() => {
+          setMessageType(null);
+          setMessage(null);
+        }, 3000);
       });
     }
   };
@@ -91,10 +128,27 @@ const App = () => {
         .deletePerson(person.id)
         .then((returnedPerson) => {
           console.log("Deleted person", returnedPerson);
-          setPersons(persons.filter((p) => p.id !== person.id));
+
+          setPersons(persons.filter((p) => p.id !== returnedPerson.id));
+
+          setMessageType("success");
+          setMessage(`Deleted ${returnedPerson.name}`);
+
+          setTimeout(() => {
+            setMessageType(null);
+            setMessage(null);
+          }, 3000);
         })
         .catch((error) => {
           console.error("Error deleting person: ", error);
+          setMessageType("error");
+          setMessage(
+            `Information of ${person.name} has already been removed from server`
+          );
+          setTimeout(() => {
+            setMessage(null);
+            setMessageType(null);
+          }, 3000);
         });
     } else {
       console.log("Person delete canceled");
@@ -104,6 +158,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification message={message} type={messageType} />
       <Filter
         newSearchName={newSearchName}
         handleSearchNameChange={handleSearchNameChange}
