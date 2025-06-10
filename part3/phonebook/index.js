@@ -28,7 +28,6 @@ let persons = [
 
 app.use(express.json());
 app.use(cors());
-app.use(express.static("dist"));
 
 morgan.token("data", (req) => {
   if (req.body && Object.keys(req.body).length > 0) {
@@ -41,6 +40,8 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :data")
 );
 
+app.use(express.static("dist"));
+
 app.get("/api/persons", (request, response) => {
   response.json(persons);
 });
@@ -50,19 +51,19 @@ app.get("/info", (request, response) => {
   response.json(`Phone book has info for ${persons.length} people${date}`);
 });
 
-app.get("/api/persons/:id", (request, repsonse) => {
+app.get("/api/persons/:id", (request, response) => {
   const id = request.params.id;
   const person = persons.find((person) => person.id === id);
   if (person) {
-    repsonse.json(person);
+    response.json(person);
   } else {
-    repsonse.json(404).end();
+    response.json(404).end();
   }
 });
 
 app.delete("/api/persons/:id", (request, response) => {
   const id = request.params.id;
-  const person = persons.filter((person) => persons.id === id);
+  persons = persons.filter((person) => person.id !== id);
   response.status(204).end();
 });
 
