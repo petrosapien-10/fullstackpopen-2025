@@ -1,7 +1,12 @@
+require("dotenv").config();
+
 const express = require("express");
+
 const morgan = require("morgan");
 const app = express();
 const cors = require("cors");
+
+const Person = require("./models/person");
 
 let persons = [
   {
@@ -43,7 +48,9 @@ app.use(
 app.use(express.static("dist"));
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  });
 });
 
 app.get("/info", (request, response) => {
@@ -68,7 +75,7 @@ app.delete("/api/persons/:id", (request, response) => {
 });
 
 app.post("/api/persons", (request, response) => {
-  const { name, number, id } = request.body;
+  const { name, number } = request.body;
 
   const isMissingName = !name;
   const isMissingNumber = !number;
@@ -87,17 +94,19 @@ app.post("/api/persons", (request, response) => {
     return response.status(400).json({ error: "name must be unique" });
   }
 
-  const person = {
-    id,
+  const person = new Person({
     name,
     number,
-  };
+  });
 
-  persons = persons.concat(person);
+  person.save().then((result) => {
+    console.log(`Added ${result.name} number ${result.name} to phonebook`);
+  });
+
   response.json(person);
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
