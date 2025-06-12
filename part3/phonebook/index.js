@@ -1,7 +1,13 @@
+require('dotenv').config()
+
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
 const cors = require("cors");
+
+const Person = require('./models/person')
+
+const Person = mongoose.model('Person', personSchema)
 
 let persons = [
   {
@@ -40,9 +46,15 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :data")
 );
 
-app.get("/api/persons", (request, response) => {
-  response.json(persons);
-});
+// app.get("/api/persons", (request, response) => {
+//   response.json(persons);
+// });
+
+app.get('/api/persons', (request, response) => {
+  Person.find({}).then(persons => {
+    response.json(persons)
+  })
+})
 
 app.get("/info", (request, response) => {
   const date = new Date();
@@ -95,7 +107,7 @@ app.post("/api/persons", (request, response) => {
   response.json(person);
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

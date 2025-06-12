@@ -4,7 +4,13 @@ if (process.argv.length < 3) {
 	console.log('give password as argument')
 	process.exit(1)
 }
+
+
 const password = process.argv[2]
+
+const persoNname = process.argv[3]
+
+const personNumber = process.argv[4]
 
 const url = `mongodb+srv://longnn:${password}@cluster0.txrkk.mongodb.net/phonebook?retryWrites=true&w=majority&appName=Cluster0`
 
@@ -20,19 +26,30 @@ const personSchema = new mongoose.Schema({
 
 const Person = mongoose.model('Person', personSchema)
 
-// const person = new Person({
-// 	name: 'Long',
-// 	number: 123123123
-// })
 
-// person.save().then(result => {
-// 	console.log('person saved!')
-// 	mongoose.connection.close()
-// })
 
-Person.find({ name: "Long" }).then(result => {
-	result.forEach(person => {
-		console.log(person)
+
+if (process.argv.length === 3) {
+
+	Person.find({}).then(result => {
+		console.log('phonebook: ')
+		result.forEach(person => {
+			console.log(`${person.name} ${person.number}`)
+		})
+		mongoose.connection.close()
 	})
-	mongoose.connection.close()
-})
+}
+
+if (process.argv.length === 5) {
+
+	const person = new Person({
+		name: persoNname,
+		number: personNumber,
+	})
+
+	person.save().then(result => {
+		console.log(`Added ${persoNname} number ${personNumber} to phonebook`)
+		mongoose.connection.close()
+	})
+}
+
