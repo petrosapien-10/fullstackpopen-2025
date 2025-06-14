@@ -24,26 +24,16 @@ app.use(
 
 app.use(express.static("dist"));
 
-app.get("/api/persons", (request, response) => {
-  Person.find({}).then((persons) => {
-    response.json(persons);
-  });
-});
-
 app.get("/info", (request, response) => {
   const date = new Date();
   response.json(`Phone book has info for ${persons.length} people${date}`);
 });
 
-// app.get("/api/persons/:id", (request, response) => {
-//   const id = request.params.id;
-//   const person = persons.find((person) => person.id === id);
-//   if (person) {
-//     response.json(person);
-//   } else {
-//     response.json(404).end();
-//   }
-// });
+app.get("/api/persons", (request, response) => {
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  });
+});
 
 app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
@@ -132,7 +122,7 @@ const errorHandler = (error, request, response, next) => {
 app.use(unknownEndpoint)
 app.use(errorHandler)
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
