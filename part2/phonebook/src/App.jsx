@@ -89,20 +89,29 @@ const App = () => {
         number: newNumber,
       };
 
-      personService.create(personObject).then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson));
+      personService.create(personObject)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
 
-        setNewName("");
-        setNewNumber("");
+          setNewName("");
+          setNewNumber("");
 
-        setMessageType("success");
-        setMessage(`Added ${returnedPerson.name}`);
+          setMessageType("success");
+          setMessage(`Added ${returnedPerson.name}`);
 
-        setTimeout(() => {
-          setMessageType(null);
-          setMessage(null);
-        }, 3000);
-      });
+          setTimeout(() => {
+            setMessageType(null);
+            setMessage(null);
+          }, 3000);
+        })
+        .catch((error) => {
+          setMessageType("error")
+          setMessage(error.response.data.error)
+          setTimeout(() => {
+            setMessage(null);
+            setMessageType(null);
+          }, 3000);
+        });
     }
   };
 
@@ -126,13 +135,11 @@ const App = () => {
     if (window.confirm(`Delete ${person.name} ?`)) {
       personService
         .deletePerson(person.id)
-        .then((returnedPerson) => {
-          console.log("Deleted person", returnedPerson);
-
-          setPersons(persons.filter((p) => p.id !== returnedPerson.id));
+        .then(() => {
+          setPersons(persons.filter((p) => p.id !== person.id));
 
           setMessageType("success");
-          setMessage(`Deleted ${returnedPerson.name}`);
+          setMessage(`Deleted ${person.name}`);
 
           setTimeout(() => {
             setMessageType(null);
