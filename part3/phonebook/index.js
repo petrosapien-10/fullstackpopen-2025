@@ -24,26 +24,20 @@ app.use(
 
 app.use(express.static("dist"));
 
+app.get("/info", (request, response, next) => {
+  Person.countDocuments({})
+    .then(count => {
+      const date = new Date();
+      response.json(`Phonebook has info for ${count} people ${date}`);
+    })
+    .catch(error => next(error));
+});
+
 app.get("/api/persons", (request, response) => {
   Person.find({}).then((persons) => {
     response.json(persons);
   });
 });
-
-app.get("/info", (request, response) => {
-  const date = new Date();
-  response.json(`Phone book has info for ${persons.length} people${date}`);
-});
-
-// app.get("/api/persons/:id", (request, response) => {
-//   const id = request.params.id;
-//   const person = persons.find((person) => person.id === id);
-//   if (person) {
-//     response.json(person);
-//   } else {
-//     response.json(404).end();
-//   }
-// });
 
 app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
@@ -65,37 +59,28 @@ app.delete("/api/persons/:id", (request, response, next) => {
     .catch(error => next(error))
 });
 
-app.post("/api/persons", (request, response) => {
-  const { name, number } = request.body;
+app.post('/api/persons', (request, response, next) => {
+  const body = request.body
 
-  const isMissingName = !name;
-  const isMissingNumber = !number;
-
-  if (isMissingName) {
-    return response.status(400).json({ error: "name is missing" });
+  if (!body.name) {
+    return response.status(400).json({ error: 'name missingg' })
   }
 
-  if (isMissingNumber) {
-    return response.status(400).json({ error: "number is missing" });
-  }
-
-  const isExisted = persons.find((person) => person.name === name);
-
-  if (isExisted) {
-    return response.status(400).json({ error: "name must be unique" });
+  if (!body.number) {
+    return response.status(400).json({ error: 'number missing' })
   }
 
   const person = new Person({
-    name,
-    number,
+    name: body.name,
+    number: body.number
   })
 
-  person.save().then((result) => {
-    console.log(`Added ${result.name} number ${result.name} to phonebook`);
-  });
-
-  response.json(person);
-});
+  person.save()
+    .then(savedPerson => {
+      response.json(savedPerson)
+    })
+    .catch(error => next(error))
+})
 
 app.put('/api/persons/:id', (request, response, next) => {
   const { name, number } = request.body
