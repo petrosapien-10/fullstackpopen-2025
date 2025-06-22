@@ -31,7 +31,7 @@ const mostBlogs = (blogs) => {
   }
 
   let topAuthor = ''
-  let topAuthorTotalBlogs = 0;
+  let topAuthorTotalBlogs = 0
 
   for (const entry of authorBlogsMap.entries()) {
     const author = entry[0]
