@@ -8,8 +8,9 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-  "title" : "test3",
+  "title" : "test100",
   "author" : "Long Nguyen 2",
   "url" : "test.com",
-  "likes" : 333
+  "likes" : 333,
+  "userId" : "685ff919b0f241070402f7d6"
 }
