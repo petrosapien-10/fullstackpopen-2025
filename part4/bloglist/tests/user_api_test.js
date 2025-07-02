@@ -21,9 +21,8 @@ describe('when there is initially one user in db', () => {
 
   test('creation succeeds with a fresh username', async () => {
     const usersAtStart = await helper.usersInDb()
-
     const newUser = {
-      username: 'longnn',
+      username: 'sofresh',
       name: 'Long Nguyen',
       password: 'blesk'
     }
@@ -35,6 +34,7 @@ describe('when there is initially one user in db', () => {
       .expect('Content-Type', /application\/json/)
 
     const usersAtEnd = await helper.usersInDb()
+
     assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
 
     const usersnames = usersAtEnd.map(u => u.username)
@@ -58,7 +58,7 @@ describe('when there is initially one user in db', () => {
 
     const usersAtEnd = await helper.usersInDb()
 
-    assert(result.body.error.includes('expected `username` to be unique'))
+    assert(result.body.error.includes('username is taken'))
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
   })
 
