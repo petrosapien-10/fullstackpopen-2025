@@ -3,7 +3,7 @@ import Blog from './components/Blog'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import "./index.css";
+import './index.css'
 import Togglable from './components/Togglable'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
@@ -54,17 +54,17 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-      showMessage(`Welcome ${user.name}! You have successfully logged in.`, "success")
+      showMessage(`Welcome ${user.name}! You have successfully logged in.`, 'success')
     } catch (exception) {
       console.log('exception: ', exception)
-      showMessage("Wrong username or password", "error")
+      showMessage('Wrong username or password', 'error')
     }
   }
 
   const handleLogout = () => {
     window.localStorage.clear()
     setUser(null)
-    showMessage("You have successfully logged out.", "success")
+    showMessage('You have successfully logged out.', 'success')
   }
 
   const showMessage = (message, type, duration = 3000) => {
@@ -83,10 +83,10 @@ const App = () => {
       setBlogs(blogs.concat(returnedBlog))
       blogFormRef.current.toggleVisibility()
 
-      showMessage(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`, "success")
+      showMessage(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`, 'success')
     } catch (error) {
       console.error('failed to create blog', error)
-      showMessage("Failed to add blog. Please try again.", "error")
+      showMessage('Failed to add blog. Please try again.', 'error')
     }
   }
 
@@ -95,7 +95,7 @@ const App = () => {
       const updatedBlog = {
         ...blogToUpdate,
         likes: blogToUpdate.likes + 1,
-        user: blogToUpdate?.user?.id || ""
+        user: blogToUpdate?.user?.id || ''
       }
 
       const returnedBlog = await blogService.update(blogToUpdate.id, updatedBlog)

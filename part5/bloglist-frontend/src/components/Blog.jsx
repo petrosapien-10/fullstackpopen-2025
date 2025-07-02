@@ -1,4 +1,4 @@
-import Togglable from "./Togglable"
+import Togglable from './Togglable'
 
 const Blog = ({ blog, userId, handleLikeClick, handleRemoveClick }) => {
   const blogStyle = {
@@ -29,7 +29,7 @@ const Blog = ({ blog, userId, handleLikeClick, handleRemoveClick }) => {
           </div>
           <div>{blog?.user?.name || 'unknown user'}</div>
           {isTheOwner(userId) && (<div>
-            <button style={{ backgroundColor: "yellow" }} onClick={handleRemoveClick}>remove</button>
+            <button style={{ backgroundColor: 'yellow' }} onClick={handleRemoveClick}>remove</button>
           </div>)}
         </Togglable>
       </div>
