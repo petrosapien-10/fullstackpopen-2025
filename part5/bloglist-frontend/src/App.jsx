@@ -64,6 +64,7 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.clear()
     setUser(null)
+    setLoginVisible(false)
     showMessage('You have successfully logged out.', 'success')
   }
 
