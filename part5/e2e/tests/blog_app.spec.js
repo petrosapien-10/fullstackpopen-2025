@@ -137,11 +137,7 @@ describe('Blog app', () => {
 
   })
 
-  // create 3 blogs
-  // hit view button and like button to like them all
-  // locate the exact div then
-  // get the likes info the check the order
-  // 
+  //5.23
   describe('blogs order', () => {
     beforeEach(async ({ page }) => {
       const blogA = {
