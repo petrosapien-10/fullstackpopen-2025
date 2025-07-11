@@ -1,3 +1,5 @@
+import { createSlice } from "@reduxjs/toolkit"
+
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -19,44 +21,64 @@ const asObject = (anecdote) => {
 
 const initialState = anecdotesAtStart.map(asObject)
 
-const reducer = (state = initialState, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
-  switch (action.type) {
-    case 'INCREMENT_VOTE': {
-      const id = action.payload.id
-      return state.map(anecdote =>
-        anecdote.id === id
-          ? { ...anecdote, votes: anecdote.votes + 1 }
-          : anecdote
-      )
+const anecdoteSlice = createSlice({
+  name: 'anecdote',
+  initialState,
+  reducers: {
+    incrementVote(state, action) {
+      const id = action.payload
+      const anecdote = state.find(a => a.id === id)
+      if (anecdote) {
+        anecdote.votes += 1
+      }
+    },
+    createAnecdote(state, action) {
+      state.push({
+        content: action.payload,
+        id: getId(),
+        votes: 0
+      })
     }
 
-    case 'NEW_ANECDOTE':
-      return [...state, action.payload]
-    default:
-      return state
   }
+})
+
+export const { incrementVote, createAnecdote } = anecdoteSlice.actions
+export default anecdoteSlice.reducer
 
 
-}
+// const reducer = (state = initialState, action) => {
+//   switch (action.type) {
+//     case 'INCREMENT_VOTE': {
+//       const id = action.payload.id
+//       return state.map(anecdote =>
+//         anecdote.id === id
+//           ? { ...anecdote, votes: anecdote.votes + 1 }
+//           : anecdote
+//       )
+//     }
 
-export const incrementVote = (id) => {
-  return {
-    type: 'INCREMENT_VOTE',
-    payload: { id }
-  }
-}
+//     case 'NEW_ANECDOTE':
+//       return [...state, action.payload]
+//     default:
+//       return state
+//   }
+// }
 
-export const createAnecdote = (content) => {
-  return {
-    type: 'NEW_ANECDOTE',
-    payload: {
-      content,
-      id: getId(),
-      votes: 0
-    }
-  }
-}
+// const incrementVote = (id) => {
+//   return {
+//     type: 'INCREMENT_VOTE',
+//     payload: { id }
+//   }
+// }
 
-export default reducer
+// const createAnecdote = (content) => {
+//   return {
+//     type: 'NEW_ANECDOTE',
+//     payload: {
+//       content,
+//       id: getId(),
+//       votes: 0
+//     }
+//   }
+// }
