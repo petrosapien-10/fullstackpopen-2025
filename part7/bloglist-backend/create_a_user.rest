@@ -1,0 +1,15 @@
+# const user = new User({
+#     username,
+#     name,
+#     passwordHash,
+#   })
+
+
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username" : "testpass",
+  "name" : "test password",
+  "password" : "test"
+}
