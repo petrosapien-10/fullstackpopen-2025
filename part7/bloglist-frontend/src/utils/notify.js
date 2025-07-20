@@ -3,7 +3,6 @@ export const showNotification = (dispatch, message, type = 'success', duration =
     type: 'SHOW',
     payload: { message, type }
   })
-
   setTimeout(() => {
     dispatch({ type: 'CLEAR' })
   }, duration)
