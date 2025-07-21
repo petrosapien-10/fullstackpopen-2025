@@ -1,17 +1,21 @@
 import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './index.css'
-import Togglable from './components/Togglable'
 import LoginForm from './components/LoginForm'
-import BlogForm from './components/BlogForm'
 import { useNotificationDispatch } from './NotificationContext'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { showNotification } from './utils/notify'
 import { useUserValue, useUserDispatch } from './UserContext'
+import { Routes, Route, Link as RouterLink } from 'react-router-dom'
+import Blog from './components/Blog'
+import UserList from './components/UserList'
+import User from './components/User'
+import Menu from './components/Menu'
+import Home from './components/Home'
 
+import { Typography, Button, Box, Container, Link } from '@mui/material'
 const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -23,7 +27,7 @@ const App = () => {
   const userDispatch = useUserDispatch()
 
   useEffect(() => {
-    const loggedInUserJSON = window.localStorage.getItem('loggedBlogappUser')
+    const loggedInUserJSON = window.localStorage.getItem('loggedInBlogappUser')
     if (loggedInUserJSON) {
       const user = JSON.parse(loggedInUserJSON)
       blogService.setToken(user.token)
@@ -43,85 +47,33 @@ const App = () => {
     retry: 1
   })
 
-  const updateBlogMutation = useMutation({
-    mutationFn: (updatedBlog) => blogService.update(updatedBlog.id, updatedBlog),
-    onSuccess: (updatedBlog) => {
-      const blogs = queryClient.getQueryData(['blogs'])
-      queryClient.setQueryData(
-        ['blogs'],
-        blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog))
-      )
-      showNotification(notificationDispatch, 'Like action success!', 'success')
-    },
-    onError: (error) => {
-      console.error(error)
-      showNotification(notificationDispatch, 'Failed to like the blog. Please try again', 'error')
-    }
-  })
   const newBlogMutation = useMutation({
     mutationFn: blogService.create,
     onSuccess: (newBlog) => {
-      const blogs = queryClient.getQueryData(['blogs'])
+      const blogs = queryClient.getQueryData(['blogs']) || []
       queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
       showNotification(
         notificationDispatch,
-        `a new blog ${newBlog.title} by ${newBlog.author} added`,
+        `A new blog "${newBlog.title}" by ${newBlog.author} added`,
         'success'
       )
     },
-    onError: (error) => {
-      console.error(error)
+    onError: () => {
       showNotification(notificationDispatch, 'Failed to add blog. Please try again.', 'error')
     }
   })
-  const deleteBlogMutation = useMutation({
-    mutationFn: (blog) => blogService.deleteBlog(blog.id),
-    onSuccess: (_, blog) => {
-      const blogs = queryClient.getQueryData(['blogs'])
-      queryClient.setQueryData(
-        ['blogs'],
-        blogs.filter((b) => b.id !== blog.id)
-      )
-      showNotification(
-        notificationDispatch,
-        `Deleted blog: ${blog.title} by ${blog.author}`,
-        'success'
-      )
-    },
-    onError: (error) => {
-      console.error(error)
-      showNotification(notificationDispatch, 'Failed to delete blog. Please try again.', 'error')
-    }
-  })
-
-  if (isLoadingBlogs) {
-    return <div>loading data...</div>
-  }
-
-  if (isError) {
-    return <span>blog service is not available due to problems in server</span>
-  }
 
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
-      const user = await loginService.login({
-        username,
-        password
-      })
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
+      const user = await loginService.login({ username, password })
+      window.localStorage.setItem('loggedInBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
-
       userDispatch({ type: 'LOGIN', payload: user })
       setUsername('')
       setPassword('')
-      showNotification(
-        notificationDispatch,
-        `Welcome ${user.name}! You have successfully logged in.`,
-        'success'
-      )
-    } catch (exception) {
-      console.log('exception: ', exception)
+      showNotification(notificationDispatch, `Welcome ${user.name}!`, 'success')
+    } catch {
       showNotification(notificationDispatch, 'Wrong username or password', 'error')
     }
   }
@@ -130,7 +82,7 @@ const App = () => {
     window.localStorage.clear()
     userDispatch({ type: 'LOGOUT' })
     setLoginVisible(false)
-    showNotification(notificationDispatch, 'You have successfully logged out.', 'success')
+    showNotification(notificationDispatch, 'You have logged out.', 'success')
   }
 
   const handleAddBlog = (newBlogObject) => {
@@ -138,25 +90,14 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
   }
 
-  const handleUpdateLikes = (blogToUpdate) => {
-    updateBlogMutation.mutate({ ...blogToUpdate, likes: blogToUpdate.likes + 1 })
-  }
-
-  const handleDeleteBlog = async (blogToDelete) => {
-    if (window.confirm(`Remove blog ${blogToDelete.title} by ${blogToDelete.author}`)) {
-      deleteBlogMutation.mutate(blogToDelete)
-    }
-  }
-
-  const loginForm = () => {
-    const hideWhenVisible = { display: loginVisible ? 'none' : '' }
-    const showWhenVisible = { display: loginVisible ? '' : 'none' }
-    return (
-      <div>
-        <div style={hideWhenVisible}>
-          <button onClick={() => setLoginVisible(true)}>log in</button>
-        </div>
-        <div style={showWhenVisible}>
+  const loginForm = () => (
+    <Box mt={2}>
+      {!loginVisible ? (
+        <Button variant='outlined' onClick={() => setLoginVisible(true)}>
+          Log in
+        </Button>
+      ) : (
+        <Box>
           <LoginForm
             username={username}
             password={password}
@@ -164,44 +105,49 @@ const App = () => {
             handlePasswordChange={({ target }) => setPassword(target.value)}
             handleSubmit={handleLogin}
           />
-          <button onClick={() => setLoginVisible(false)}>cancel</button>
-        </div>
-      </div>
-    )
-  }
-
-  console.log('blogs', blogs)
-  console.log('user', user)
-  return (
-    <div>
-      <h1>Blogs</h1>
-      <Notification />
-
-      {!user ? (
-        <div>{loginForm()}</div>
-      ) : (
-        <div>
-          <p>{user.name} logged-in</p>
-          <button onClick={handleLogout}>logout</button>
-
-          <Togglable showButtonLabel='create new blog' hideButtonLabel='cancel' ref={blogFormRef}>
-            <BlogForm createBlog={handleAddBlog} />
-          </Togglable>
-
-          {blogs
-            .sort((a, b) => b.likes - a.likes)
-            .map((blog) => (
-              <Blog
-                key={blog.id}
-                blog={blog}
-                handleLikeClick={() => handleUpdateLikes(blog)}
-                handleRemoveClick={() => handleDeleteBlog(blog)}
-                userId={user?.id}
-              />
-            ))}
-        </div>
+          <Button variant='text' onClick={() => setLoginVisible(false)} sx={{ mt: 1 }}>
+            Cancel
+          </Button>
+        </Box>
       )}
-    </div>
+    </Box>
+  )
+
+  if (isLoadingBlogs) return <Typography>Loading data...</Typography>
+  if (isError) return <Typography color='error'>Blog service is not available.</Typography>
+
+  return (
+    <Container>
+      <Menu user={user} onLogout={handleLogout} />
+      <Box mt={2}>
+        <Notification />
+        <Typography variant='h3' gutterBottom>
+          Blog App
+        </Typography>
+
+        <Routes>
+          <Route
+            path='/'
+            element={
+              !user ? (
+                loginForm()
+              ) : (
+                <Home
+                  user={user}
+                  blogs={blogs}
+                  onLogout={handleLogout}
+                  onAddBlog={handleAddBlog}
+                  blogFormRef={blogFormRef}
+                />
+              )
+            }
+          />
+          <Route path='/users' element={<UserList />} />
+          <Route path='/users/:id' element={<User />} />
+          <Route path='/blogs/:id' element={<Blog />} />
+        </Routes>
+      </Box>
+    </Container>
   )
 }
 

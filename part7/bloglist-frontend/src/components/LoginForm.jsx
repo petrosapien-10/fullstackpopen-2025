@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { Box, Button, TextField, Typography, Paper } from '@mui/material'
 
 const LoginForm = ({
   handleSubmit,
@@ -8,33 +9,41 @@ const LoginForm = ({
   password
 }) => {
   return (
-    <div>
-      <h2>Login</h2>
+    <Paper elevation={2} sx={{ p: 3 }}>
+      <Typography variant='h5' gutterBottom>
+        Login
+      </Typography>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          username
-          <input
-            data-testid='username'
-            type='text'
-            value={username}
-            name='Username'
-            onChange={handleUsernameChange}
-          />
-        </div>
-        <div>
-          password
-          <input
-            data-testid='password'
-            type='password'
-            value={password}
-            name='Password'
-            onChange={handlePasswordChange}
-          />
-        </div>
-        <button type='submit'>login</button>
-      </form>
-    </div>
+      <Box component='form' onSubmit={handleSubmit} display='flex' flexDirection='column' gap={2}>
+        <TextField
+          data-testid='username'
+          label='Username'
+          type='text'
+          value={username}
+          onChange={handleUsernameChange}
+          fullWidth
+        />
+
+        <TextField
+          data-testid='password'
+          label='Password'
+          type='password'
+          value={password}
+          onChange={handlePasswordChange}
+          fullWidth
+        />
+
+        <Button
+          type='submit'
+          variant='contained'
+          color='primary'
+          size='small'
+          sx={{ alignSelf: 'flex-start' }}
+        >
+          Login
+        </Button>
+      </Box>
+    </Paper>
   )
 }
 

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Box, TextField, Button, Typography, Paper } from '@mui/material'
 
 const BlogForm = ({ createBlog }) => {
   const [newBlogTitle, setNewBlogTitle] = useState('')
@@ -22,43 +23,50 @@ const BlogForm = ({ createBlog }) => {
   }
 
   return (
-    <div>
-      <h2>create new</h2>
+    <Paper elevation={2} sx={{ p: 3 }}>
+      <Typography variant='h5' gutterBottom>
+        Create new blog
+      </Typography>
 
-      <form onSubmit={addBlog}>
-        <div>
-          title:
-          <input
-            data-testid='title'
-            type='text'
-            value={newBlogTitle}
-            onChange={({ target }) => setNewBlogTitle(target.value)}
-            placeholder='enter title'
-          />
-        </div>
-        <div>
-          author:
-          <input
-            data-testid='author'
-            type='text'
-            value={newBlogAuthor}
-            onChange={({ target }) => setNewBlogAuthor(target.value)}
-            placeholder='enter author'
-          />
-        </div>
-        <div>
-          url:
-          <input
-            data-testid='url'
-            type='text'
-            value={newBlogUrl}
-            onChange={({ target }) => setNewBlogUrl(target.value)}
-            placeholder='enter url'
-          />
-        </div>
-        <button type='submit'>create</button>
-      </form>
-    </div>
+      <Box component='form' onSubmit={addBlog} display='flex' flexDirection='column' gap={2}>
+        <TextField
+          data-testid='title'
+          label='Title'
+          value={newBlogTitle}
+          onChange={({ target }) => setNewBlogTitle(target.value)}
+          placeholder='Enter blog title'
+          fullWidth
+        />
+
+        <TextField
+          data-testid='author'
+          label='Author'
+          value={newBlogAuthor}
+          onChange={({ target }) => setNewBlogAuthor(target.value)}
+          placeholder='Enter blog author'
+          fullWidth
+        />
+
+        <TextField
+          data-testid='url'
+          label='URL'
+          value={newBlogUrl}
+          onChange={({ target }) => setNewBlogUrl(target.value)}
+          placeholder='Enter blog URL'
+          fullWidth
+        />
+
+        <Button
+          type='submit'
+          variant='contained'
+          color='primary'
+          size='small'
+          sx={{ alignSelf: 'flex-start' }}
+        >
+          Create
+        </Button>
+      </Box>
+    </Paper>
   )
 }
 

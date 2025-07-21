@@ -8,7 +8,9 @@ blogsRouter.get("/", async (request, response) => {
 });
 
 blogsRouter.get("/:id", async (request, response) => {
-  const blog = await Blog.findById(request.params.id);
+  const blog = await Blog.findById(request.params.id).populate("user", {
+    name: 1,
+  });
   if (blog) {
     response.json(blog);
   } else {
@@ -80,6 +82,20 @@ blogsRouter.put("/:id", async (request, response) => {
   } else {
     response.status(404).end();
   }
+});
+
+blogsRouter.post("/:id/comments", async (request, response) => {
+  const { comment } = request.body;
+
+  const blog = await Blog.findById(request.params.id);
+  if (!blog) {
+    return response.status(404).json({ error: "Blog not found" });
+  }
+
+  blog.comments = blog.comments.concat(comment);
+  const updatedBlog = await blog.save();
+
+  response.status(201).json(updatedBlog);
 });
 
 module.exports = blogsRouter;
