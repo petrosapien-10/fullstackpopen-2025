@@ -84,7 +84,7 @@ const Authors = ({ show, setError }) => {
             onChange={(event) => setBirthYear(event.target.value)}
           />
         </div>
-        <button type="submit">add</button>
+        <button type="submit">update author</button>
       </form>
     </div>
   );
