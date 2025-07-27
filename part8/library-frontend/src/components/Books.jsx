@@ -1,37 +1,71 @@
 import { useQuery } from "@apollo/client";
-import { ALL_BOOKS } from "../queries";
+import { ALL_BOOKS, ALL_BOOKS_BY_GENRE } from "../queries";
+import { useState } from "react";
+
 const Books = (props) => {
-  const result = useQuery(ALL_BOOKS);
+  const [genre, setGenre] = useState("");
 
-  if (!props.show) {
-    return null;
-  }
+  const allBooksByGenreResult = useQuery(ALL_BOOKS_BY_GENRE, {
+    variables: { genre },
+    skip: !props.show,
+  });
 
-  if (result.loading) {
+  const allBooksResult = useQuery(ALL_BOOKS);
+
+  if (!props.show) return null;
+  if (allBooksByGenreResult.loading || allBooksResult.loading)
     return <div>Loading...</div>;
-  }
-  const books = result.data.allBooks;
+  if (allBooksByGenreResult.error || allBooksResult.error)
+    return <div>Error loading books</div>;
+
+  const books = allBooksByGenreResult.data?.allBooks || [];
+  const allBooks = allBooksResult.data?.allBooks || [];
+
+  const allGenres = [...new Set(allBooks.flatMap((book) => book.genres))];
 
   return (
     <div>
       <h2>books</h2>
+      <p>
+        in genre <strong>{genre || "all"}</strong>
+      </p>
 
       <table>
-        <tbody>
+        <thead>
           <tr>
-            <th></th>
+            <th>title</th>
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.map((a) => (
-            <tr key={a.title}>
-              <td>{a.title}</td>
-              <td>{a.author}</td>
-              <td>{a.published}</td>
+        </thead>
+        <tbody>
+          {books.map((book) => (
+            <tr key={book.id}>
+              <td>{book.title}</td>
+              <td>{book.author.name}</td>
+              <td>{book.published}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <div>
+        {/*genre === "" makes the backend skip filtering, so all books are returned*/}
+        <button onClick={() => setGenre("")}>All genres</button>
+        {allGenres.map((genreOption) => (
+          <button
+            key={genreOption}
+            value={genreOption}
+            onClick={(e) => {
+              const selectedGenre = e.target.value;
+              setGenre(selectedGenre);
+              allBooksByGenreResult.refetch({ genre: selectedGenre });
+            }}
+          >
+            {genreOption}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
