@@ -18,7 +18,7 @@ const App = () => {
     setErrorMessage(message);
     setTimeout(() => {
       setErrorMessage(null);
-    }, 10000);
+    }, 5000);
   };
 
   const logout = () => {
@@ -51,7 +51,7 @@ const App = () => {
 
       <Authors show={page === "authors"} setError={notify} />
 
-      <Books show={page === "books"} />
+      <Books show={page === "books"} setError={notify} />
 
       {!token && (
         <Login
