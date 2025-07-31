@@ -1,5 +1,18 @@
 {
-  "compilerOptions":{
-    "noImplicitAny": false
-  }
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "declaration": true
+  },
+  "include": ["./"],
+  "exclude": ["node_modules"]
 }
+
+

@@ -1,4 +1,4 @@
-interface Result {
+export interface Result {
   periodLength: number;
   trainingDays: number;
   success: boolean;
@@ -8,7 +8,7 @@ interface Result {
   average: number;
 }
 
-interface ExerciseInput {
+export interface ExerciseInput {
   target: number;
   dailyHours: number[];
 }
@@ -35,12 +35,13 @@ export const parseArguments = (args: string[]): ExerciseInput => {
 };
 
 export const calculateExercises = (
-  values: number[],
+  dailyHours: number[],
   target: number
 ): Result => {
-  const periodLength = values.length;
-  const trainingDays = values.filter((value) => value > 0).length;
-  const average = values.reduce((sum, value) => sum + value, 0) / periodLength;
+  const periodLength = dailyHours.length;
+  const trainingDays = dailyHours.filter((value) => value > 0).length;
+  const average =
+    dailyHours.reduce((sum, value) => sum + value, 0) / periodLength;
   const success = average >= target;
 
   let rating: number;
@@ -68,13 +69,15 @@ export const calculateExercises = (
   };
 };
 
-try {
-  const { target, dailyHours } = parseArguments(process.argv);
-  console.log(calculateExercises(dailyHours, target));
-} catch (error: unknown) {
-  let errorMessage = "something went wrong: ";
-  if (error instanceof Error) {
-    errorMessage += error.message;
+if (require.main === module) {
+  try {
+    const { target, dailyHours } = parseArguments(process.argv);
+    console.log(calculateExercises(dailyHours, target));
+  } catch (error: unknown) {
+    let errorMessage = "something went wrong: ";
+    if (error instanceof Error) {
+      errorMessage += error.message;
+    }
+    console.log(errorMessage);
   }
-  console.log(errorMessage);
 }
