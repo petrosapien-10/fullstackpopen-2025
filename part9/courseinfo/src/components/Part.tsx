@@ -1,4 +1,5 @@
 import { type CoursePart } from "../types";
+import { assertNever } from "../utils/assertNever";
 
 interface PartProps {
   part: CoursePart;
@@ -44,5 +45,7 @@ export const Part = ({ part }: PartProps): React.JSX.Element => {
           <p>required skills: {part.requirements.join(", ")} </p>
         </>
       );
+    default:
+      return assertNever(part);
   }
 };
