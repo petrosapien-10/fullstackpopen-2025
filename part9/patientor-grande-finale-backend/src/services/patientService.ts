@@ -23,7 +23,7 @@ const getPatient = (id: string): Patient | undefined => {
     ssn: patient.ssn,
     gender: patient.gender as Gender,
     occupation: patient.occupation,
-    entries: [],
+    entries: [...patient.entries],
   };
 };
 
