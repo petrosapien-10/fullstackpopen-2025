@@ -9,6 +9,7 @@ import {
   HealthCheckEntry,
   HealthCheckRating,
   OccupationalHealthcareEntry,
+  HospitalEntry,
 } from "../../types";
 import { Gender } from "../../types";
 import FemaleIcon from "@mui/icons-material/Female";
@@ -114,12 +115,38 @@ export const PatientPage = () => {
     }
   };
 
-  const getDiagnoseDescription = (code: string): string => {
-    return diagnoses.find((d) => d.code === code)?.name ?? "uknown";
+  const GetDiagnoseName = (code: string): string => {
+    return diagnoses.find((d) => d.code === code)?.name ?? "unknown";
   };
 
-  const HospitalEntry = () => {
-    return <></>;
+  const HospitalEntry: React.FC<{
+    entry: HospitalEntry;
+  }> = ({ entry }) => {
+    return (
+      <Box
+        sx={{
+          border: 1,
+          borderColor: "black",
+          borderRadius: 1,
+          margin: 1,
+          padding: 1,
+        }}
+      >
+        {entry.date} <EntryIcon entryType={entry.type} />
+        <p>{entry.description}</p>
+        <ul>
+          {entry.diagnosisCodes?.map((code) => (
+            <li>
+              {code} {GetDiagnoseName(code)}
+            </li>
+          ))}
+        </ul>
+        <p>diagnose by {entry.specialist}</p>
+        <p>
+          discharge {entry.discharge.date} {entry.discharge.criteria}
+        </p>
+      </Box>
+    );
   };
 
   const OccupationalHealthcare: React.FC<{
@@ -137,6 +164,13 @@ export const PatientPage = () => {
       >
         {entry.date} <EntryIcon entryType={entry.type} /> {entry.employerName}
         <p>{entry.description}</p>
+        <ul>
+          {entry.diagnosisCodes?.map((code) => (
+            <li>
+              {code} {GetDiagnoseName(code)}
+            </li>
+          ))}
+        </ul>
         <p>diagnose by {entry.specialist}</p>
       </Box>
     );
@@ -157,6 +191,13 @@ export const PatientPage = () => {
           {entry.date} <EntryIcon entryType={entry.type} />
         </p>
         <p>{entry.description}</p>
+        <ul>
+          {entry.diagnosisCodes?.map((code) => (
+            <li>
+              {code} {GetDiagnoseName(code)}
+            </li>
+          ))}
+        </ul>
         <HealthCheckIcon entryHealthCheckRating={entry.healthCheckRating} />
         <p>dianose by {entry.specialist}</p>
       </Box>
@@ -172,7 +213,7 @@ export const PatientPage = () => {
   const EntryDetails: React.FC<{ entry: Entry }> = ({ entry }) => {
     switch (entry.type) {
       case "Hospital":
-        return <HospitalEntry />;
+        return <HospitalEntry entry={entry} />;
       case "OccupationalHealthcare":
         return <OccupationalHealthcare entry={entry} />;
       case "HealthCheck":
@@ -191,20 +232,6 @@ export const PatientPage = () => {
       <p>occupation: {patient?.occupation}</p>
       <h3>entries</h3>
       <div>
-        {/* {patient?.entries.map((entry) => (
-          <>
-            <p>
-              {entry.date} {entry.description}
-            </p>
-            <ul>
-              {entry.diagnosisCodes?.map((code) => (
-                <li>
-                  {code} {getDiagnoseDescription(code)}
-                </li>
-              ))}
-            </ul>
-          </>
-        ))} */}
         {patient?.entries.map((entry) => (
           <EntryDetails entry={entry} />
         ))}
