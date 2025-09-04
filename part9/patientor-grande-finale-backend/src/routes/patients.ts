@@ -2,7 +2,13 @@ import express, { NextFunction, Request, Response } from "express";
 import patientService from "../services/patientService";
 import { NewPatientSchema } from "../utils";
 import { z } from "zod";
-import { NewPatient, NonSensitivePatient } from "../types";
+import {
+  Diagnosis,
+  Entry,
+  EntryWithoutId,
+  NewPatient,
+  NonSensitivePatient,
+} from "../types";
 
 const router = express.Router();
 
@@ -12,14 +18,12 @@ router.get("/", (_req, res) => {
 
 router.get("/:id", (req, res) => {
   const id = req.params.id;
-  console.log("get id was run", id);
   res.send(patientService.getPatient(id));
 });
 
 const newPatientParser = (req: Request, _res: Response, next: NextFunction) => {
   try {
     NewPatientSchema.parse(req.body);
-    console.log("red.body: ", req.body);
     next();
   } catch (error: unknown) {
     next(error);
@@ -37,6 +41,7 @@ const errorMiddleware = (
   } else {
     next(error);
   }
+  ``;
 };
 
 router.post(
@@ -48,6 +53,48 @@ router.post(
   ) => {
     const addedPatient = patientService.addPatient(req.body);
     res.json(addedPatient);
+  }
+);
+
+const parseDiagnosisCodes = (object: unknown): Array<Diagnosis["code"]> => {
+  if (!object || typeof object !== "object" || !("diagnosisCodes" in object)) {
+    return [] as Array<Diagnosis["code"]>;
+  }
+  return object.diagnosisCodes as Array<Diagnosis["code"]>;
+};
+
+const newEntryParser = (req: Request, _res: Response, next: NextFunction) => {
+  try {
+    const { type, date, specialist, description } = req.body;
+
+    if (!type || !date || !specialist || !description) {
+      throw new Error("Missing required fields");
+    }
+
+    req.body.diagnosisCodes = parseDiagnosisCodes(req.body);
+
+    next();
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+router.post(
+  "/:id/entries",
+  newEntryParser,
+  (
+    req: Request<{ id: string }, unknown, EntryWithoutId>,
+    res: Response<Entry>,
+    next: NextFunction
+  ) => {
+    try {
+      const patientId = req.params.id;
+      console.log("PatientId: ", patientId);
+      const addedEntry = patientService.addEntry(patientId, req.body);
+      res.json(addedEntry);
+    } catch (error: unknown) {
+      next(error);
+    }
   }
 );
 
