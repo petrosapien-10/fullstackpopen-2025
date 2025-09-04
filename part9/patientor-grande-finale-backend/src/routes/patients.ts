@@ -1,9 +1,8 @@
 import express, { NextFunction, Request, Response } from "express";
 import patientService from "../services/patientService";
-import { NewPatientSchema } from "../utils";
+import { NewPatientSchema, NewEntrySchema } from "../utils";
 import { z } from "zod";
 import {
-  Diagnosis,
   Entry,
   EntryWithoutId,
   NewPatient,
@@ -41,7 +40,6 @@ const errorMiddleware = (
   } else {
     next(error);
   }
-  ``;
 };
 
 router.post(
@@ -56,23 +54,9 @@ router.post(
   }
 );
 
-const parseDiagnosisCodes = (object: unknown): Array<Diagnosis["code"]> => {
-  if (!object || typeof object !== "object" || !("diagnosisCodes" in object)) {
-    return [] as Array<Diagnosis["code"]>;
-  }
-  return object.diagnosisCodes as Array<Diagnosis["code"]>;
-};
-
 const newEntryParser = (req: Request, _res: Response, next: NextFunction) => {
   try {
-    const { type, date, specialist, description } = req.body;
-
-    if (!type || !date || !specialist || !description) {
-      throw new Error("Missing required fields");
-    }
-
-    req.body.diagnosisCodes = parseDiagnosisCodes(req.body);
-
+    NewEntrySchema.parse(req.body);
     next();
   } catch (error: unknown) {
     next(error);

@@ -40,13 +40,13 @@ export const HealthCheckEntry: React.FC<HealthCheckEntryProps> = ({
       <p>{entry.description}</p>
       <ul>
         {entry.diagnosisCodes?.map((code) => (
-          <li>
+          <li key={code}>
             {code} {getDiagnoseName(code)}
           </li>
         ))}
       </ul>
       <HealthCheckIcon entryHealthCheckRating={entry.healthCheckRating} />
-      <p>dianose by {entry.specialist}</p>
+      <p>diagnose by {entry.specialist}</p>
     </Box>
   );
 };

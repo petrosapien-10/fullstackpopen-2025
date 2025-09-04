@@ -19,7 +19,7 @@ export const HospitalEntry: React.FC<HospitalEntryProps> = ({
       <p>{entry.description}</p>
       <ul>
         {entry.diagnosisCodes?.map((code) => (
-          <li>
+          <li key={code}>
             {code} {getDiagnoseName(code)}
           </li>
         ))}
